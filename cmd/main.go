@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	showVersion    bool
-	probePrintOnce bool
+	showVersion bool
+	showDevices bool
+	metricsPort int
 
 	rootCmd = &cobra.Command{
 		Use:   "hpessa-exporter",
@@ -24,8 +25,10 @@ var (
 func init() {
 	rootCmd.Flags().BoolVarP(&showVersion,
 		"version", "v", false, "show version and exit")
-	rootCmd.Flags().BoolVarP(&probePrintOnce,
-		"print", "p", false, "probe-print devices and exit")
+	rootCmd.Flags().BoolVarP(&showDevices,
+		"show", "s", false, "probe-print devices and exit")
+	rootCmd.Flags().IntVarP(&metricsPort,
+		"port", "p", devmon.DefaultMetricsPort, "metrics port")
 }
 
 func main() {
@@ -41,13 +44,13 @@ func start() {
 			runtime.Version(), runtime.GOOS, runtime.GOARCH)
 		os.Exit(0)
 	}
-	if probePrintOnce {
+	if showDevices {
 		if err := devmon.ProbePrintDevices(); err != nil {
 			os.Exit(1)
 		}
 		os.Exit(0)
 	}
-	if err := devmon.RunDevicesExporter(); err != nil {
+	if err := devmon.RunDevicesExporter(metricsPort); err != nil {
 		os.Exit(1)
 	}
 }

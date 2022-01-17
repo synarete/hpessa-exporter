@@ -6,7 +6,7 @@ resources:
   - rbac.yaml
   - podmonitor.yaml
   - daemonset.yaml
-namespace: openshift-hpessa-exporter
+namespace: openshift-storage-hpessa
 commonLabels:
   app.kubernetes.io/name: hpessa-exporter
 configurations:

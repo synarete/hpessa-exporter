@@ -12,21 +12,27 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
+var (
+	DefaultMetricsPort = int(8080)
+)
+
 type deviceExporter struct {
-	log logr.Logger
-	sdp *storageDevicesProbe
-	reg *prometheus.Registry
-	mux *http.ServeMux
-	any bool
+	log  logr.Logger
+	sdp  *storageDevicesProbe
+	reg  *prometheus.Registry
+	mux  *http.ServeMux
+	port int
+	any  bool
 }
 
-func newDeviceExporter(log logr.Logger) *deviceExporter {
+func newDeviceExporter(log logr.Logger, port int) *deviceExporter {
 	return &deviceExporter{
-		log: log,
-		sdp: newStorageDevicesProbe(log),
-		reg: prometheus.NewRegistry(),
-		mux: http.NewServeMux(),
-		any: false,
+		log:  log,
+		sdp:  newStorageDevicesProbe(log),
+		reg:  prometheus.NewRegistry(),
+		mux:  http.NewServeMux(),
+		port: port,
+		any:  false,
 	}
 }
 
@@ -43,7 +49,7 @@ func (dex *deviceExporter) init() error {
 }
 
 func (dex *deviceExporter) serve() error {
-	addr := ":8080"
+	addr := fmt.Sprintf(":%d", dex.port)
 	dex.log.Info("serve metrics", "addr", addr)
 
 	handler := promhttp.HandlerFor(dex.reg, promhttp.HandlerOpts{})
@@ -63,9 +69,9 @@ func (dex *deviceExporter) serve() error {
 	return nil
 }
 
-func RunDevicesExporter() error {
+func RunDevicesExporter(port int) error {
 	log := zap.New(zap.UseFlagOptions(&zap.Options{}))
-	dex := newDeviceExporter(log)
+	dex := newDeviceExporter(log, port)
 	if err := dex.init(); err != nil {
 		return err
 	}

@@ -5,7 +5,7 @@ metadata:
   name: hpessa-exporter
   annotations:
     kubernetes.io/description: >
-      hpessa-exporter SCC is used for openshift-hpessa-exporter
+      hpessa-exporter SCC is used for openshift-storage-hpessa
 
 allowPrivilegedContainer: true
 allowHostDirVolumePlugin: true
@@ -31,4 +31,4 @@ supplementalGroups:
   type: RunAsAny
 volumes: ["*"]
 users:
-  - system:serviceaccount:openshift-hpessa-exporter:hpessa-exporter
+  - system:serviceaccount:openshift-storage-hpessa:hpessa-exporter

@@ -3,11 +3,10 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: hpessa-exporter
-  namespace: openshift-hpessa-exporter
+  namespace: openshift-storage-hpessa
   labels:
-    app.kubernetes.io/component: exporter
     app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-hpessa-exporter
+    app.kubernetes.io/part-of: openshift-storage-hpessa
 rules:
   - apiGroups:
       - apps
@@ -62,19 +61,14 @@ rules:
       - delete
       - get
       - use
-  - nonResourceURLs:
-      - /metrics
-    verbs:
-      - get
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: hpessa-exporter
   labels:
-    app.kubernetes.io/component: exporter
     app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-hpessa-exporter
+    app.kubernetes.io/part-of: openshift-storage-hpessa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -82,7 +76,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: hpessa-exporter
-    namespace: openshift-hpessa-exporter
+    namespace: openshift-storage-hpessa
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1

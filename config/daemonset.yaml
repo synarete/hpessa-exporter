@@ -3,25 +3,24 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: hpessa-exporter
-  namespace: openshift-hpessa-exporter
+  namespace: openshift-storage-hpessa
   labels:
-    app.kubernetes.io/component: exporter
     app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-hpessa-exporter
+    app.kubernetes.io/part-of: openshift-storage-hpessa
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/component: exporter
       app.kubernetes.io/name: hpessa-exporter
-      app.kubernetes.io/part-of: openshift-hpessa-exporter
+      app.kubernetes.io/part-of: openshift-storage-hpessa
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: hpessa-exporter
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
       labels:
-        app.kubernetes.io/component: exporter
         app.kubernetes.io/name: hpessa-exporter
-        app.kubernetes.io/part-of: openshift-hpessa-exporter
+        app.kubernetes.io/part-of: openshift-storage-hpessa
     spec:
       containers:
         - name: hpessa-exporter
@@ -32,7 +31,7 @@ spec:
               name: metrics
               protocol: TCP
           command: ["/hpessa-exporter"]
-          # args: [""]
+          args: ["--port=8080"]
           resources:
             requests:
               cpu: 8m
