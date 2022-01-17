@@ -39,16 +39,17 @@ type SsaConfigInfo struct {
 }
 
 type SsaPhysicalDriveInfo struct {
-	ID        string `json:"id"`
-	Box       string `json:"box"`
-	Bay       string `json:"bay"`
-	Size      string `json:"size"`
-	SizeBytes uint64 `json:"sizebytes"`
-	Status    string `json:"status"`
-	Serial    string `json:"serial"`
-	TempCurr  int64  `json:"tempcurr"`
-	TempMaxi  int64  `json:"tempmaxi"`
-	UniqueID  string `json:"uniqueid"`
+	ID         string `json:"id"`
+	Box        string `json:"box"`
+	Bay        string `json:"bay"`
+	Size       string `json:"size"`
+	SizeBytes  uint64 `json:"sizebytes"`
+	Status     string `json:"status"`
+	Serial     string `json:"serial"`
+	TempCurr   int64  `json:"tempcurr"`
+	TempMaxi   int64  `json:"tempmaxi"`
+	UniqueID   string `json:"uniqueid"`
+	PowerHours int64  `json:"powerhours"`
 }
 
 type SsaLogicalDriveInfo struct {
@@ -195,7 +196,12 @@ func hasSubSections(line string, secs ...string) bool {
 		return false
 	}
 	for _, sec := range secs {
-		if strings.Index(strings.TrimSpace(line), sec) == 0 {
+		sline := strings.TrimSpace(line)
+		if strings.Index(sline, sec) == 0 {
+			subs := strings.Split(sline, " ")
+			if len(subs) > 2 && subs[0] == "physicaldrive" {
+				return false
+			}
 			return true
 		}
 	}
@@ -295,6 +301,8 @@ func ParseConfigToLogical(config *SsaConfigInfo) (*SsaMap, error) {
 				pdi.TempCurr = parseTemp(valueByPrefix(pd.Values, "Current Temperature"))
 				pdi.TempMaxi = parseTemp(valueByPrefix(pd.Values, "Maximum Temperature"))
 				pdi.UniqueID = pd.Values["Drive Unique ID"]
+				pdi.PowerHours = parseInt64(pd.Values["Power On Hours"])
+
 				ldi.PhysicalDrives = append(ldi.PhysicalDrives, pdi)
 			}
 			ret.DevMap[name] = ldi
@@ -355,6 +363,14 @@ func parseTemp(s string) int64 {
 		return 0
 	}
 	return int64(val)
+}
+
+func parseInt64(s string) int64 {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return -1
+	}
+	return val
 }
 
 func NewSsaMap() *SsaMap {

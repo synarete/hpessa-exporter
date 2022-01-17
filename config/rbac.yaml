@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/part-of: openshift-hpessa-exporter
 rules:
   - apiGroups:
-      - "apps"
+      - apps
     resources:
       - deployments
       - daemonsets
@@ -35,6 +35,13 @@ rules:
       - delete
       - watch
   - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+  - apiGroups:
       - monitoring.coreos.com
     resources:
       - prometheusrules
@@ -56,15 +63,14 @@ rules:
       - get
       - use
   - nonResourceURLs:
-      - "/metrics"
+      - /metrics
     verbs:
-      - "get"
+      - get
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: hpessa-exporter
-  namespace: openshift-hpessa-exporter
   labels:
     app.kubernetes.io/component: exporter
     app.kubernetes.io/name: hpessa-exporter
@@ -81,8 +87,7 @@ subjects:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: hpessa-exporter-prom
-  namespace: openshift-hpessa-exporter
+  name: hpessa-exporter-metrics
 rules:
   - apiGroups:
       - ""
@@ -98,12 +103,11 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: hpessa-exporter-prom
-  namespace: openshift-hpessa-exporter
+  name: hpessa-exporter-metrics
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hpessa-exporter
+  name: hpessa-exporter-metrics
 subjects:
   - kind: ServiceAccount
     name: prometheus-k8s

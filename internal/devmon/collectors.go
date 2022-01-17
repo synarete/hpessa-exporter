@@ -167,40 +167,52 @@ func (col *ssaPhysicalDrivesCollector) Collect(ch chan<- prometheus.Metric) {
 			continue
 		}
 		for _, pdi := range ldi.PhysicalDrives {
+			labels := []string{ldi.DiskName, pdi.ID, pdi.Box, pdi.Bay, pdi.UniqueID}
+
 			ch <- prometheus.MustNewConstMetric(col.dsc[0],
-				prometheus.GaugeValue,
-				statusToValue(pdi.Status),
-				sdi.Name, pdi.ID, pdi.Box, pdi.Bay, pdi.UniqueID)
+				prometheus.GaugeValue, statusToValue(pdi.Status), labels...)
 
 			ch <- prometheus.MustNewConstMetric(col.dsc[1],
-				prometheus.GaugeValue,
-				float64(pdi.TempCurr),
-				sdi.Name, pdi.ID, pdi.Box, pdi.Bay, pdi.UniqueID)
+				prometheus.GaugeValue, float64(pdi.SizeBytes), labels...)
 
 			ch <- prometheus.MustNewConstMetric(col.dsc[2],
-				prometheus.GaugeValue,
-				float64(pdi.TempMaxi),
-				sdi.Name, pdi.ID, pdi.Box, pdi.Bay, pdi.UniqueID)
+				prometheus.GaugeValue, float64(pdi.TempCurr), labels...)
+
+			ch <- prometheus.MustNewConstMetric(col.dsc[3],
+				prometheus.GaugeValue, float64(pdi.TempMaxi), labels...)
+
+			ch <- prometheus.MustNewConstMetric(col.dsc[4],
+				prometheus.GaugeValue, float64(pdi.PowerHours), labels...)
+
 		}
 	}
 }
 
 func (dex *deviceExporter) newSsaPhysicalDrivesCollector() prometheus.Collector {
+	subsys := "ssa_physical_device"
+	labels := []string{"dev", "id", "box", "bay", "uniqueid"}
 	col := &ssaPhysicalDrivesCollector{}
 	col.dex = dex
 	col.dsc = []*prometheus.Desc{
 		prometheus.NewDesc(
-			collectorName("ssa_physical_device", "status"),
-			"Status of physical device",
-			[]string{"dev", "id", "box", "bay", "uniqueid"}, nil),
+			collectorName(subsys, "status"),
+			"Status of physical device", labels, nil),
+
 		prometheus.NewDesc(
-			collectorName("ssa_physical_device", "temp_curr"),
-			"Current temperature of physical device",
-			[]string{"dev", "id", "box", "bay", "uniqueid"}, nil),
+			collectorName(subsys, "size"),
+			"Size in bytes of physical device", labels, nil),
+
 		prometheus.NewDesc(
-			collectorName("ssa_physical_device", "temp_maxi"),
-			"Maximal temperature of physical device",
-			[]string{"dev", "id", "box", "bay", "uniqueid"}, nil),
+			collectorName(subsys, "temp_curr"),
+			"Current temperature of physical device", labels, nil),
+
+		prometheus.NewDesc(
+			collectorName(subsys, "temp_maxi"),
+			"Maximal temperature of physical device", labels, nil),
+
+		prometheus.NewDesc(
+			collectorName(subsys, "power_hours"),
+			"Power on in hours", labels, nil),
 	}
 	return col
 }

@@ -176,8 +176,7 @@ clean: ## Clean build outputs
 ##@ Build tools
 
 .PHONY: build-tools
-build-tools: pre-build-layout install-yq install-kustomize \
-	install-controller-gen install-golangci-lint
+build-tools: pre-build-layout install-yq install-kustomize install-golangci-lint
 
 .PHONY: install-yq
 install-yq: $(YQ) ## Download and install yq

@@ -31,3 +31,4 @@ COPY --from=builder /workspace/hpessa-exporter .
 USER 65532:65532
 
 ENTRYPOINT ["/hpessa-exporter"]
+EXPOSE 8080

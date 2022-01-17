@@ -848,6 +848,15 @@ func TestParseConfigToLogical(t *testing.T) {
 	assert.Equal(t, ldib.Size, "931.48 GB")
 	assert.Greater(t, ldib.SizeBytes, uint64(931)*devmon.Giga)
 	assert.Greater(t, uint64(932)*devmon.Giga, ldib.SizeBytes)
+
+	for _, ldi := range ldm.DevMap {
+		for _, pdi := range ldi.PhysicalDrives {
+			assert.Greater(t, pdi.SizeBytes, uint64(0))
+			assert.Greater(t, pdi.TempCurr, int64(0))
+			assert.Greater(t, pdi.TempMaxi, int64(0))
+			assert.True(t, (pdi.PowerHours > 0) || (pdi.PowerHours == -1))
+		}
+	}
 }
 
 func TestParseConfigToLogical2(t *testing.T) {
@@ -862,4 +871,13 @@ func TestParseConfigToLogical2(t *testing.T) {
 	ldb := ldm.DevMap["sdb"]
 	assert.Equal(t, ldb.UniqueID, "600508B1001CCD7B72DB95E459CDDCCC")
 	assert.Equal(t, len(ldb.PhysicalDrives), 4)
+
+	for _, ldi := range ldm.DevMap {
+		for _, pdi := range ldi.PhysicalDrives {
+			assert.Greater(t, pdi.SizeBytes, uint64(0))
+			assert.Greater(t, pdi.TempCurr, int64(0))
+			assert.Greater(t, pdi.TempMaxi, int64(0))
+			assert.True(t, (pdi.PowerHours > 0) || (pdi.PowerHours == -1))
+		}
+	}
 }
