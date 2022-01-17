@@ -1,0 +1,11 @@
+# Build tools & outputs
+/build
+/devel-vars.mk
+
+# Dependency directories
+/vendor
+
+# Editor & IDE files/dir
+/.vscode
+*~
+

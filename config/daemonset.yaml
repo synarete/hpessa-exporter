@@ -1,0 +1,99 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hpessa-exporter
+  namespace: openshift-hpessa-exporter
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: hpessa-exporter
+    app.kubernetes.io/part-of: openshift-hpessa-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: hpessa-exporter
+      app.kubernetes.io/part-of: openshift-hpessa-exporter
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: hpessa-exporter
+      labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: hpessa-exporter
+        app.kubernetes.io/part-of: openshift-hpessa-exporter
+    spec:
+      containers:
+        - name: hpessa-exporter
+          image: "quay.io/ssharon/hpessa-exporter:latest"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          command: ["/hpessa-exporter"]
+          # args: [""]
+          resources:
+            requests:
+              cpu: 8m
+              memory: 32Mi
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /host/sys
+              mountPropagation: HostToContainer
+              name: sys
+              readOnly: true
+            - mountPath: /host/dev
+              mountPropagation: HostToContainer
+              name: dev
+              readOnly: true
+            - mountPath: /opt
+              mountPropagation: HostToContainer
+              name: opt
+              readOnly: true
+            - mountPath: /lib64
+              mountPropagation: HostToContainer
+              name: lib64
+              readOnly: true
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: hpessa-exporter
+      tolerations:
+        - operator: Exists
+      volumes:
+        - hostPath:
+            path: /sys
+          name: sys
+        - hostPath:
+            path: /dev
+          name: dev
+        - hostPath:
+            path: /opt
+          name: opt
+        - hostPath:
+            path: /lib64
+          name: lib64
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 10%
+    type: RollingUpdate

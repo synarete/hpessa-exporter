@@ -1,0 +1,19 @@
+---
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - security-context-constraints.yaml
+  - rbac.yaml
+  - podmonitor.yaml
+  - daemonset.yaml
+namespace: openshift-hpessa-exporter
+commonLabels:
+  app.kubernetes.io/name: hpessa-exporter
+configurations:
+  - kustomizeconfig.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+  - name: hpessa-exporter
+    newName: quay.io/ssharon/ hpessa-exporter
+    newTag: latest

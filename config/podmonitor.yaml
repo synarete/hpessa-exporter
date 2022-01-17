@@ -1,0 +1,23 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: hpessa-exporter
+    app.kubernetes.io/part-of: openshift-hpessa-exporter
+  name: hpessa-exporter-monitor
+  namespace: openshift-hpessa-exporter
+spec:
+  namespaceSelector:
+    matchNames:
+      - openshift-hpessa-exporter
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: hpessa-exporter
+      app.kubernetes.io/part-of: openshift-hpessa-exporter
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 1m
