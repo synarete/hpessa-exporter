@@ -183,7 +183,6 @@ func (col *ssaPhysicalDrivesCollector) Collect(ch chan<- prometheus.Metric) {
 
 			ch <- prometheus.MustNewConstMetric(col.dsc[4],
 				prometheus.GaugeValue, float64(pdi.PowerHours), labels...)
-
 		}
 	}
 }

@@ -49,7 +49,7 @@ type SsaPhysicalDriveInfo struct {
 	TempCurr   int64  `json:"tempcurr"`
 	TempMaxi   int64  `json:"tempmaxi"`
 	UniqueID   string `json:"uniqueid"`
-	PowerHours int64  `json:"powerhours"`
+	PowerHours int64  `json:"powerhours"` // nolint:misspell
 }
 
 type SsaLogicalDriveInfo struct {
