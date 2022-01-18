@@ -12,9 +12,9 @@ etc.) may hint administrators on potential up-coming failures.
 - Install [HPE Smart Storage Administrator](https://support.hpe.com/hpesc/public/docDisplay?docId=emr_na-c04455150) 
   on local host machines. Ensure that the **ssacli** is installed on one of the
   following locations:
-	- /usr/sbin/ssacli
-	- /opt/smartstorageadmin/ssacli/bin/ssacli
-	- /opt/hp/ssacli/bld/ssacli
+	- `/usr/sbin/ssacli`
+	- `/opt/smartstorageadmin/ssacli/bin/ssacli`
+	- `/opt/hp/ssacli/bld/ssacli`
 
 
 ## Deployment 
