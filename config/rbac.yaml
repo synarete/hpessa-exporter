@@ -11,7 +11,6 @@ rules:
   - apiGroups:
       - apps
     resources:
-      - deployments
       - daemonsets
     verbs:
       - get
@@ -23,7 +22,6 @@ rules:
     resources:
       - services
       - daemonsets
-      - endpoints
       - pods
       - pods/exec
       - pods/log
@@ -34,24 +32,15 @@ rules:
       - delete
       - watch
   - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
-  - apiGroups:
       - monitoring.coreos.com
     resources:
       - prometheusrules
-      - servicemonitors
       - podmonitors
     verbs:
       - get
       - list
       - create
       - delete
-      - update
   - apiGroups:
       - security.openshift.io
     resources:
@@ -77,32 +66,3 @@ subjects:
   - kind: ServiceAccount
     name: hpessa-exporter
     namespace: openshift-storage-hpessa
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: hpessa-exporter-metrics
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - services
-      - endpoints
-      - pods
-    verbs:
-      - get
-      - list
-      - watch
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: hpessa-exporter-metrics
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: hpessa-exporter-metrics
-subjects:
-  - kind: ServiceAccount
-    name: prometheus-k8s
-    namespace: openshift-monitoring

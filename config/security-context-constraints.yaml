@@ -6,12 +6,11 @@ metadata:
   annotations:
     kubernetes.io/description: >
       hpessa-exporter SCC is used for openshift-storage-hpessa
-
 allowPrivilegedContainer: true
 allowHostDirVolumePlugin: true
 allowHostPID: true
-allowHostNetwork: true
-allowHostPorts: true
+allowHostNetwork: false
+allowHostPorts: false
 allowHostIPC: false
 priority:
 readOnlyRootFilesystem: false
