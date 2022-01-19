@@ -3,10 +3,6 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: hpessa-exporter
-  namespace: openshift-storage-hpessa
-  labels:
-    app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-storage-hpessa
 rules:
   - apiGroups:
       - apps
@@ -22,25 +18,18 @@ rules:
     resources:
       - services
       - daemonsets
+      - endpoints
       - pods
-      - pods/exec
-      - pods/log
     verbs:
       - get
       - list
-      - create
-      - delete
       - watch
   - apiGroups:
       - monitoring.coreos.com
     resources:
-      - prometheusrules
-      - podmonitors
+      - "*"
     verbs:
-      - get
-      - list
-      - create
-      - delete
+      - "*"
   - apiGroups:
       - security.openshift.io
     resources:
@@ -55,9 +44,6 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: hpessa-exporter
-  labels:
-    app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-storage-hpessa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -66,3 +52,35 @@ subjects:
   - kind: ServiceAccount
     name: hpessa-exporter
     namespace: openshift-storage-hpessa
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: hpessa-exporter
+  namespace: openshift-storage-hpessa
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - endpoints
+      - daemonsets
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: hpessa-exporter
+  namespace: openshift-storage-hpessa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hpessa-exporter
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-k8s
+    namespace: openshift-monitoring
