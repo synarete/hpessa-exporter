@@ -4,6 +4,7 @@ kind: Namespace
 metadata:
   labels:
     app.kubernetes.io/name: hpessa-exporter
+    openshift.io/cluster-monitoring: "true"
   name: openshift-storage-hpessa
 ---
 apiVersion: v1
@@ -20,7 +21,7 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/name: hpessa-exporter
-  name: hpessa-exporter-metrics
+  name: hpessa-exporter
   namespace: openshift-storage-hpessa
 rules:
   - apiGroups:
@@ -28,6 +29,7 @@ rules:
     resources:
       - services
       - endpoints
+      - daemonsets
       - pods
     verbs:
       - get
@@ -39,14 +41,11 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-storage-hpessa
   name: hpessa-exporter
-  namespace: openshift-storage-hpessa
 rules:
   - apiGroups:
       - apps
     resources:
-      - deployments
       - daemonsets
     verbs:
       - get
@@ -60,33 +59,16 @@ rules:
       - daemonsets
       - endpoints
       - pods
-      - pods/exec
-      - pods/log
     verbs:
       - get
       - list
-      - create
-      - delete
       - watch
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
   - apiGroups:
       - monitoring.coreos.com
     resources:
-      - prometheusrules
-      - servicemonitors
-      - podmonitors
+      - '*'
     verbs:
-      - get
-      - list
-      - create
-      - delete
-      - update
+      - '*'
   - apiGroups:
       - security.openshift.io
     resources:
@@ -102,12 +84,12 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: hpessa-exporter
-  name: hpessa-exporter-metrics
+  name: hpessa-exporter
   namespace: openshift-storage-hpessa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: hpessa-exporter-metrics
+  name: hpessa-exporter
 subjects:
   - kind: ServiceAccount
     name: prometheus-k8s
@@ -118,7 +100,6 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: hpessa-exporter
-    app.kubernetes.io/part-of: openshift-storage-hpessa
   name: hpessa-exporter
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -242,7 +223,7 @@ spec:
     matchNames:
       - openshift-storage-hpessa
   podMetricsEndpoints:
-    - interval: 1m
+    - interval: 3m
       path: /metrics
       port: metrics
   selector:
@@ -252,9 +233,9 @@ spec:
 ---
 allowHostDirVolumePlugin: true
 allowHostIPC: false
-allowHostNetwork: true
+allowHostNetwork: false
 allowHostPID: true
-allowHostPorts: true
+allowHostPorts: false
 allowPrivilegedContainer: true
 allowedCapabilities:
   - SYS_ADMIN
