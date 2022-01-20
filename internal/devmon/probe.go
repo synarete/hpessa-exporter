@@ -27,6 +27,7 @@ type storageDevicesProbe struct {
 	procfs *ProcFS
 	sysfs  *SysFS
 	clnt   *client
+	hasSSA bool
 }
 
 func newStorageDevicesProbe(log logr.Logger) *storageDevicesProbe {
@@ -35,6 +36,7 @@ func newStorageDevicesProbe(log logr.Logger) *storageDevicesProbe {
 		ident:  SelfIdent(),
 		procfs: NewProcFS(),
 		sysfs:  NewSysFS(),
+		hasSSA: true,
 	}
 }
 
@@ -54,12 +56,14 @@ func (sdp *storageDevicesProbe) init() error {
 func (sdp *storageDevicesProbe) initXtool() error {
 	loc, err := LocateSsa()
 	if err != nil {
+		sdp.hasSSA = false
 		sdp.log.Info("unable to find ssacli tool")
 		return nil // OK
 	}
 	sdp.log.Info("found ssacli tool at: " + loc)
 	vers, err := RunSsaVersion()
 	if err != nil {
+		sdp.hasSSA = false
 		sdp.log.Error(err, "failed to run ssacli tool")
 		return err
 	}
@@ -125,6 +129,15 @@ func (sdp *storageDevicesProbe) probeBlockDevices() ([]BlkdevInfo, error) {
 		return []BlkdevInfo{}, err
 	}
 	return bdi, nil
+}
+
+func (sdp *storageDevicesProbe) probeBlockDevicesIO() ([]BlkdevIOInfo, error) {
+	ret, err := DescoveBlockDevicesIO(sdp.procfs, sdp.sysfs)
+	if err != nil {
+		sdp.log.Error(err, "failed to discover block devices IO stats")
+		return []BlkdevIOInfo{}, err
+	}
+	return ret, nil
 }
 
 func (sdp *storageDevicesProbe) probeSsaLogicalDevices() (*SsaMap, error) {

@@ -78,12 +78,11 @@ func (procfs *ProcFS) parseLoadAvg(vals []string) (*SysLoadAvg, error) {
 // DiskStats converts "/proc/diskstats" info into BlkdevIOStat representation.
 // See: https://www.kernel.org/doc/Documentation/ABI/testing/procfs-diskstats
 func (procfs *ProcFS) DiskStats() ([]BlkdevIOInfo, error) {
+	ret := []BlkdevIOInfo{}
 	dat, err := procfs.ReadFile("diskstats")
 	if err != nil {
-		return nil, err
+		return ret, err
 	}
-
-	ret := []BlkdevIOInfo{}
 	for _, line := range strings.Split(dat, "\n") {
 		ln := strings.TrimSpace(line)
 		if len(ln) == 0 {

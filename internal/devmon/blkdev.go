@@ -58,3 +58,18 @@ func DiscoverBlkdevInfo(procfs *ProcFS, sysfs *SysFS) ([]BlkdevInfo, error) {
 	}
 	return ret, nil
 }
+
+func DescoveBlockDevicesIO(procfs *ProcFS, sysfs *SysFS) ([]BlkdevIOInfo, error) {
+	ret := []BlkdevIOInfo{}
+	disks, err := procfs.DiskStats()
+	if err != nil {
+		return ret, err
+	}
+	for _, dio := range disks {
+		name := dio.DeviceName
+		if isblk, _ := sysfs.IsBlock(name); isblk {
+			ret = append(ret, dio)
+		}
+	}
+	return ret, nil
+}

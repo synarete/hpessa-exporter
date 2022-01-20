@@ -34,9 +34,12 @@ func (dex *deviceExporter) listCollectors() []prometheus.Collector {
 		goc := collectors.NewGoCollector()
 		cols = append(cols, prc, goc)
 	}
-	cols = append(cols, newExporterVersionCollector())
+	if !dex.sdp.hasSSA {
+		cols = append(cols, dex.newBlkdevCollector())
+		cols = append(cols, dex.newBlkdevIOCollector())
+	}
+	cols = append(cols, dex.newExporterVersionCollector())
 	cols = append(cols, dex.newSsaVersionCollector())
-	cols = append(cols, dex.newBlkdevCollector())
 	cols = append(cols, dex.newSsaLogicalDrivesCollector())
 	cols = append(cols, dex.newSsaPhysicalDrivesCollector())
 	return cols
@@ -46,7 +49,7 @@ func collectorName(subsystem, name string) string {
 	return prometheus.BuildFQName(collectorsNamespace, subsystem, name)
 }
 
-func newExporterVersionCollector() prometheus.Collector {
+func (dex *deviceExporter) newExporterVersionCollector() prometheus.Collector {
 	gauge := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: collectorName("exporter", "info"),
 		Help: "Version of the exporter.",
@@ -121,6 +124,38 @@ func (dex *deviceExporter) newBlkdevCollector() prometheus.Collector {
 			collectorName("blkdev", "size_bytes"),
 			"Block device size in bytes.",
 			[]string{"name", "major", "minor", "vendor", "model"}, nil),
+	}
+	return col
+}
+
+type blkdevIOCollector struct {
+	deCollector
+}
+
+func (col *blkdevIOCollector) Collect(ch chan<- prometheus.Metric) {
+	bdis, _ := col.dex.sdp.probeBlockDevicesIO()
+	for _, bdi := range bdis {
+		ch <- prometheus.MustNewConstMetric(col.dsc[0],
+			prometheus.GaugeValue,
+			float64(bdi.ReadsIOs),
+			bdi.DeviceName)
+		ch <- prometheus.MustNewConstMetric(col.dsc[1],
+			prometheus.GaugeValue,
+			float64(bdi.WritesIOs),
+			bdi.DeviceName)
+	}
+}
+
+func (dex *deviceExporter) newBlkdevIOCollector() prometheus.Collector {
+	col := &blkdevIOCollector{}
+	col.dex = dex
+	col.dsc = []*prometheus.Desc{
+		prometheus.NewDesc(
+			collectorName("blkdev", "read_ios"),
+			"Read I/O count.", []string{"name"}, nil),
+		prometheus.NewDesc(
+			collectorName("blkdev", "write_ios"),
+			"Write I/O count.", []string{"name"}, nil),
 	}
 	return col
 }
