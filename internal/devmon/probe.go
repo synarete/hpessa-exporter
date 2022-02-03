@@ -41,13 +41,13 @@ func newStorageDevicesProbe(log logr.Logger) *storageDevicesProbe {
 }
 
 func (sdp *storageDevicesProbe) init() error {
-	if err := sdp.initXtool(); err != nil {
-		return err
-	}
 	if err := sdp.initClient(); err != nil {
 		return err
 	}
 	if err := sdp.initSelf(); err != nil {
+		return err
+	}
+	if err := sdp.initXtool(); err != nil {
 		return err
 	}
 	return nil

@@ -16,28 +16,16 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - services
-      - daemonsets
-      - endpoints
       - pods
     verbs:
       - get
       - list
       - watch
   - apiGroups:
-      - monitoring.coreos.com
-    resources:
-      - "*"
-    verbs:
-      - "*"
-  - apiGroups:
       - security.openshift.io
     resources:
       - securitycontextconstraints
     verbs:
-      - create
-      - delete
-      - get
       - use
 ---
 kind: ClusterRoleBinding

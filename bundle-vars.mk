@@ -1,5 +1,5 @@
 # VERSION defines the project version for the bundle.
-VERSION ?= 0.0.1
+VERSION ?= 0.2
 
 # Image URL to use all building/pushing image targets
 IMAGE_REGISTRY ?= quay.io

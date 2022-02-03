@@ -37,7 +37,7 @@ func newDeviceExporter(log logr.Logger, port int) *deviceExporter {
 }
 
 func (dex *deviceExporter) init() error {
-	dex.log.Info("init devices probe")
+	dex.log.Info("init devices exporter")
 	if err := dex.sdp.init(); err != nil {
 		return err
 	}
